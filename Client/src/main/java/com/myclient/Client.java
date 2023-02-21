@@ -36,6 +36,42 @@ public class Client {
                         break;
                     }
 
+                    String[] splitMessage = message.split(" ");
+                    if (splitMessage[0].equals("-file")) {
+                        File file = new File("d:/file1.txt");
+                        //InputStream inputStream = null;
+                        OutputStream outputStream = clientSocket.getOutputStream();
+
+                        try {
+                            FileInputStream fileIn = new FileInputStream(file);
+                            outputStream = clientSocket.getOutputStream();
+                            //out.write(file.getName());
+                            //out.flush();
+                            //DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file));
+
+                            byte[] bt = new byte[1024];
+                            while ((fileIn.read(bt)) > 0) {
+                                outputStream.write(bt);
+                            }
+                            out.flush();
+
+                            //FileInputStream fis = new FileInputStream(file);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+//                        sendFileToServer(clientSocket.getOutputStream(), splitMessage[1]);
+//                        //получаем OutputStream, чтобы писать в него данные запроса
+//                        OutputStream outputStream = clientSocket.getOutputStream();
+//
+//                        Reader fr = new FileReader("d:/file1.txt");
+//                        fr.transferTo(out);
+//                        out.flush();
+//
+//                        outputStream.write(1);
+//                        //outputStream.flush();
+                    }
+
+
                     //System.out.println("5");
 
                     String serverOutback = in.readLine();
@@ -50,5 +86,9 @@ public class Client {
         } catch (IOException e) {
             System.err.println(e);
         }
+    }
+
+    private static void sendFileToServer(OutputStream outputStream, String s) {
+
     }
 }

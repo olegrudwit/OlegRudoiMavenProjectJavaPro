@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>Server</artifactId>
+    <artifactId>StartChatApp</artifactId>
 
     <properties>
         <maven.compiler.source>18</maven.compiler.source>
@@ -18,20 +18,25 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <!-- Client -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
+            <groupId>org.example</groupId>
+            <artifactId>Client</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
-<!--        &lt;!&ndash; Client &ndash;&gt;-->
+        <!-- Server -->
 <!--        <dependency>-->
 <!--            <groupId>org.example</groupId>-->
-<!--            <artifactId>Client</artifactId>-->
+<!--            <artifactId>Server</artifactId>-->
+<!--            <version>1.0-SNAPSHOT</version>-->
 <!--        </dependency>-->
-
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>Server</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>
