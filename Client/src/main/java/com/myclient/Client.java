@@ -2,8 +2,6 @@ package com.myclient;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.channels.FileChannel;
-import java.nio.channels.SocketChannel;
 
 public class Client {
     private static final String CLOSE_CONNECTION_KEY = "-exit";
@@ -16,7 +14,6 @@ public class Client {
 
         try {
             clientSocket = new Socket("localhost", 4004);
-
             try (
                     BufferedReader reader = new BufferedReader(
                             new InputStreamReader(System.in));
@@ -25,7 +22,6 @@ public class Client {
                     BufferedWriter out = new BufferedWriter(
                             new OutputStreamWriter(clientSocket.getOutputStream()))) {
 
-                System.out.println("in.readLine()");
                 System.out.println(in.readLine());
 
                 while (isActive) {
@@ -39,8 +35,6 @@ public class Client {
                         case CLOSE_CONNECTION_KEY -> disconnectClientFromServer();
                         case SEND_FILE_KEY -> sendFileToServer(out, splitMessage[1]);
                     }
-
-                    System.out.println("waiting?");
 
                     String serverOutback = in.readLine();
                     System.out.println(serverOutback);
@@ -60,41 +54,18 @@ public class Client {
     }
 
     private static void sendFileToServer(BufferedWriter out, String path) throws IOException {
-        //File file = new File("d:/file1.txt");
-
-        //InputStream inputStream = null;
-        //OutputStream outputStream;
-
         try {
             File file = new File(path);
             try (FileInputStream fileIn = new FileInputStream(file)) {
                 OutputStream outputStream = clientSocket.getOutputStream();
 
                 sendMessage(out, file.getName() + "/n");
-
-//                SocketChannel sc = clientSocket.getChannel();
-//                FileChannel fc = new RandomAccessFile(file, "r").getChannel();
-//
-//                fc.transferTo(0, fc.size(), sc);
-
-
                 fileIn.transferTo(outputStream);
-
-//                byte[] bt = new byte[1024];
-//                while ((fileIn.read(bt)) > 0) {
-//                    outputStream.write(bt);
-//                    System.out.print("1");
-//                }
-                System.out.println("end");
             }
-            System.out.println("before flush");
             out.flush();
-            System.out.println("flush");
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("method end");
     }
 
     private static void disconnectClientFromServer() {

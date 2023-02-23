@@ -1,2 +1,5 @@
 /.idea/
 
+/Server/target/
+/Client/target/
+/Client/resources/

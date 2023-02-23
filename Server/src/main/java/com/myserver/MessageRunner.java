@@ -2,18 +2,16 @@ package com.myserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.channels.FileChannel;
-import java.nio.channels.SocketChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class MessageRunner extends Thread {
     private static final String CLOSE_CONNECTION_KEY = "-exit";
     private static final String SAVE_FILE_KEY = "-file";
-    private Socket socket;
-    private ClientConnection client;
-    private BufferedReader in;
-    private BufferedWriter out;
+    private final Socket socket;
+    private final ClientConnection client;
+    private final BufferedReader in;
+    private final BufferedWriter out;
     private boolean isActive = true;
 
 
@@ -43,7 +41,8 @@ public class MessageRunner extends Thread {
                     default -> Server.sendToEveryone(response);
                 }
             }
-            System.out.println("[" + client.getName() + "] left the chat");
+            String notification = "[" + client.getName() + "] left the chat";
+            Server.sendToEveryone(notification);
         } catch (IOException e) {
             System.err.println(e);
         }
@@ -59,36 +58,24 @@ public class MessageRunner extends Thread {
         fileName = fileName.substring(0, fileName.length() - 2);
 
         Path filePath = Path.of("server/resources/" + client.getName());
-        System.out.println(Files.exists(filePath));
         if(!Files.exists(filePath)) {
             Files.createDirectories(filePath);
-            System.out.println(Files.exists(filePath));
         }
 
-        //String filePath = "server/resources/"+ client.getName() + "/" + fileName;
-
         File file = new File(filePath + "/" + fileName);
-//        while (!file.createNewFile()) {
-//            fileName = "(1)" + fileName;
-//            file.renameTo(new File(filePath + "/" + fileName));
-//        }
+        while (!file.createNewFile()) {
+            fileName = "(1)" + fileName;
+            file.renameTo(new File(filePath + "/" + fileName));
+        }
 
         InputStream inputStream = socket.getInputStream();
         FileOutputStream fileReceive = new FileOutputStream(file, true);
 
-//        SocketChannel sc = socket.getChannel();
-//        FileChannel fc = new FileOutputStream(file).getChannel();
-//
-//
-//        fc.transferFrom(sc,0, fc.size());
-
-        Files.copy(inputStream, file.toPath());
-
-//        byte[] bt = new byte[1024];
-//        while ((inputStream.read(bt)) > 0) {
-//            fileReceive.write(bt);
-//            System.out.print("1");
-//        }
+        byte[] bt = new byte[1024];
+        while ((inputStream.read(bt)) > 0) {
+            fileReceive.write(bt);
+            System.out.print("1");
+        }
         out.flush();
         System.out.println("end");
 
