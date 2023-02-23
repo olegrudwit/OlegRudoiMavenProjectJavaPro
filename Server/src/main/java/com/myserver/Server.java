@@ -13,33 +13,33 @@ public class Server {
     private static final int SERVER_SOCKET_PORT = 4004;
     private static final String CLIENT_NAME_PATTERN = "client-";
     private static int clientCounter = 1;
-    static Map<String, ClientConnection> activeConnections = new HashMap<>();
+    static Map<String, MessageRunner> activeConnections = new HashMap<>();
 
     public static void main(String[] args) {
         System.out.println("System started");
 
         try {
+
             try {
                 server = new ServerSocket(SERVER_SOCKET_PORT);
                 System.out.println("Server started");
 
                 while (true) {
-                    //System.out.println("1");
                     Socket socket = server.accept();
-
-                    //System.out.println("2");
                     ClientConnection client = initClientConnection(socket);
 
                     try {
-                        MessageRunner messageRunner = new MessageRunner(client);
+                        MessageRunner runner = new MessageRunner(client);
+                        activeConnections.put(client.getName(), runner);
+
+                        String greetingsMassage = "[SERVER]: ["
+                                + client.getName()
+                                + "] joined the conversation" + "\n";
+                        sendToEveryone(greetingsMassage);
                     } catch (IOException e) {
                         System.err.println(e);
-                        System.err.println(client.getName() + " lost connection");
-                        //deleteClientConnection(client);
-                        System.out.println("delete");
                         socket.close();
                     }
-                    //System.out.println("4");
                 }
             } finally {
                 System.out.println("Server stopped");
@@ -50,20 +50,21 @@ public class Server {
         }
     }
 
+    static void sendToEveryone(String message) {
+        activeConnections.forEach((key, value) -> value.sendResponse(message));
+    }
+
     static void deleteClientConnection(ClientConnection client) {
-        //System.out.println("before " + activeConnections.size());
         activeConnections.remove(client.getName());
-        //System.out.println("after " + activeConnections.size());
     }
 
     private static ClientConnection initClientConnection(Socket socket) {
         var client = new ClientConnection(socket);
         String clientName = CLIENT_NAME_PATTERN + clientCounter++;
-        //System.out.println("3 " + clientName);
+
         client.setName(clientName);
         client.setLoginTime(new Timestamp(new Date().getTime()));
 
-        activeConnections.put(clientName, client);
         return client;
     }
 
